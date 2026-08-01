@@ -32,6 +32,11 @@ An AI-powered email assistant built using **n8n**, **Groq LLM**, and the **Gmail
 4. After approval, Gmail sends the email automatically.
 
 ---
+## 📸 Workflow
+
+Below is the n8n workflow powering the AI Email Assistant.
+
+![AI Email Assistant Workflow](screenshots/workflow.png)
 
 ## 📂 Repository Structure
 
