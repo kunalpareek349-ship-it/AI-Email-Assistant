@@ -2,7 +2,9 @@
 
 An AI-powered email assistant built using **n8n**, **Groq LLM**, and the **Gmail API**. The assistant generates professional email drafts, supports a human approval workflow, and automates email sending.
 
-## Features
+---
+
+## ✨ Features
 
 - 🤖 AI-powered email drafting
 - 📧 Gmail integration
@@ -11,32 +13,56 @@ An AI-powered email assistant built using **n8n**, **Groq LLM**, and the **Gmail
 - 📋 Structured output parser
 - ⚡ Workflow automation with n8n
 
-## Tech Stack
+---
 
-- n8n
-- Groq LLM
-- Gmail API
+## 🛠️ Tech Stack
 
-## Workflow
+- **n8n**
+- **Groq LLM**
+- **Gmail API**
+- **JSON Workflow**
 
-1. User requests an email draft.
-2. AI generates the recipient, subject, and body.
-3. User reviews and approves the draft.
-4. Email is sent via Gmail.
+---
 
-## Files
+## 🔄 Workflow
 
-- `AI-Email-Assistant-Workflow.json` — n8n workflow export
-- `README.md` — Project documentation
-- `LICENSE` — MIT License
+1. User enters an email request.
+2. AI generates the recipient, subject, and email body.
+3. The user reviews the generated email.
+4. After approval, Gmail sends the email automatically.
 
-## Future Improvements
+---
 
-- Calendar integration
+## 📂 Repository Structure
+
+```
+AI-Email-Assistant/
+│── AI-Email-Assistant-Workflow.json
+│── README.md
+│── LICENSE
+```
+
+---
+
+## 🚀 Future Improvements
+
 - Email scheduling
+- Calendar integration
 - Multiple AI model support
+- HTML email templates
+- Attachment support
 - Better approval workflow
 
-## Author
+---
 
-Kunal Pareek
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+## 👨‍💻 Author
+
+**Kunal Pareek**
+
+GitHub: https://github.com/kunalpareek349-ship-it
