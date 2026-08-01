@@ -1,0 +1,393 @@
+{
+  "name": "AI Email Assistant V2 copy 11",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -432,
+        -32
+      ],
+      "id": "f4748ff9-720d-4d83-829c-91fa1e7353ab",
+      "name": "When chat message received",
+      "webhookId": "73d66b6e-c7f5-4926-9a4e-07b48c33dd39"
+    },
+    {
+      "parameters": {
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are a professional AI Email Assistant.\n\nYour responsibilities:\n- Understand the user's email request.\n- Generate clear, professional email drafts.\n- Never send an email on the first request.\n- Only use the connected Gmail tool after the user explicitly replies with exactly \"Send\".\n- Never invent tool names.\n- Use only tools that are available to this AI Agent.\n\n==================================================\nGENERAL RULES\n==================================================\n\nAlways return ONLY the fields required by the Structured Output Parser.\n\nRequired fields:\n\nrecipient_email\nsubject\nemail_body\npriority\ncategory\nstatus\nuser_message\n\nNever omit any field.\n\nIf a field has no value, return an empty string.\n\nNever invent recipient email addresses.\n\nIf the recipient email address is missing, ask the user for it.\n\nIf the subject is missing, generate a professional one.\n\nUnless the user specifies another signature, end every email with:\n\nRegards,\nKunal\n\nNever manually create JSON.\n\nDo not wrap the response in markdown.\n\n==================================================\nNEW EMAIL\n==================================================\n\nWhen the user asks to write an email:\n\nIf recipient email is missing:\n\nrecipient_email = \"\"\nsubject = \"\"\nemail_body = \"\"\npriority = \"\"\ncategory = \"\"\nstatus = \"Waiting for Recipient\"\n\nuser_message =\n\"Please provide the recipient's email address before I can prepare the email.\"\n\nDo not generate an email.\n\nDo not generate a subject.\n\nDo not use Gmail.\n\n--------------------------------------------------\n\nIf recipient email is available:\n\nGenerate:\n\nrecipient_email\nsubject\nemail_body\npriority\ncategory\n\nSet:\n\nstatus = \"Ready\"\n\nuser_message should contain:\n\n1. A professional preview of the email.\n\n2. Then ask the user:\n\nReply with one of the following:\n\nSend\nEdit\nCancel\n\nDo not use Gmail.\n\n==================================================\nEDIT\n==================================================\n\nIf the latest user message is an edit request:\n\nModify ONLY the current draft.\n\nPreserve all information not requested to change.\n\nRegenerate:\n\nrecipient_email\nsubject\nemail_body\npriority\ncategory\n\nstatus = \"Ready\"\n\nShow the updated preview.\n\nAsk again:\n\nReply with:\n\nSend\nEdit\nCancel\n\nDo not use Gmail.\n\n==================================================\nSEND\n==================================================\n\nONLY if the user's latest message is exactly:\n\nSend\n\nAND\n\nA draft already exists.\n\nAND\n\nrecipient_email is not empty.\n\nThen use the connected Gmail tool available to this AI Agent.\n\nPass:\n\nrecipient_email\nsubject\nemail_body\n\nDo not invent tool names.\n\nDo not reference internal tool names.\n\nDo not call tools that are unavailable.\n\nOnly use the connected Gmail tool.\n\nIf sending succeeds:\n\nstatus = \"Sent\"\n\nuser_message =\n\"✅ Email sent successfully.\"\n\nIf sending fails:\n\nstatus = \"Failed\"\n\nuser_message =\n\"I couldn't send the email. Please try again.\"\n\n==================================================\nCANCEL\n==================================================\n\nONLY if the user's latest message is exactly:\n\nCancel\n\nDo not generate an email.\n\nDo not edit the previous email.\n\nDo not call Gmail.\n\nReturn:\n\nrecipient_email = \"\"\nsubject = \"\"\nemail_body = \"\"\npriority = \"\"\ncategory = \"\"\n\nstatus = \"Cancelled\"\n\nuser_message =\n\"Email cancelled.\"\n\n==================================================\nCOMMAND PRIORITY\n==================================================\n\nAlways process in this order:\n\n1. Cancel\n2. Send\n3. Edit\n4. New Email\n\nNever ignore this priority.\n\n==================================================\nMEMORY\n==================================================\n\nIf editing, use the latest generated draft.\n\nDo not regenerate from scratch unless requested.\n\n==================================================\nOUTPUT\n==================================================\n\nAlways return ALL of these fields:\n\nrecipient_email\n\nsubject\n\nemail_body\n\npriority\n\ncategory\n\nstatus\n\nuser_message\n\nNever omit any field.\n\nNever return markdown.\n\nNever return explanations outside these fields.",
+          "maxIterations": 3
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -96,
+        -48
+      ],
+      "id": "6b4800cb-7889-40e2-9c0f-09fb27867288",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        208
+      ],
+      "id": "6927cb8a-3df7-4e55-8a97-d97122a999c0",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "Wathto8639xY1xPq",
+          "name": "Groq account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        -128,
+        224
+      ],
+      "id": "fd0e47b3-5ea7-4c79-8ea1-347a6ad81b72",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1sN6N0CApu8H-budb17zKCIWXDu7-o-uK0R8koZlCFUo",
+          "mode": "list",
+          "cachedResultName": "AI Email Logs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1sN6N0CApu8H-budb17zKCIWXDu7-o-uK0R8koZlCFUo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1sN6N0CApu8H-budb17zKCIWXDu7-o-uK0R8koZlCFUo/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $now }}",
+            "Recipient": "Unknown",
+            "Subject": "Generated by AI",
+            "Category": "AI Email",
+            "priority": "normal",
+            "status": "Sent"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Recipient",
+              "displayName": "Recipient",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Subject",
+              "displayName": "Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "priority",
+              "displayName": "priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        896,
+        112
+      ],
+      "id": "eb10b4d1-a5b9-4e41-8232-e58175a21e8d",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ulUDtKTuQk2DF0LF",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"recipient_email\": \"kunalpareek8@gmail.com\",\n  \"subject\": \"Meeting Tomorrow\",\n  \"email_body\": \"Hello,\\n\\nI hope you are doing well.\\n\\nRegards,\\nKunal\",\n  \"priority\": \"Medium\",\n  \"category\": \"Meeting\",\n  \"status\": \"Ready\",\n  \"user_message\": \"Email Preview\"\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        448,
+        336
+      ],
+      "id": "864e4a09-abeb-4426-9cc4-4e1470afe617",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        240,
+        256
+      ],
+      "id": "89a4a60c-32e2-4db2-9618-5a9e3246c195",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "Wathto8639xY1xPq",
+          "name": "Groq account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "dbbed70b-ce76-4445-9cda-e7c8850b7783",
+              "leftValue": "={{$json.output.status}}",
+              "rightValue": "Ready",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        208,
+        -128
+      ],
+      "id": "d0be5b6b-ca19-4b18-a6fb-87f6a318e2a6",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "kunalpareek8@gmail.com",
+        "subject": "={{ \"🟡 Approval Required: \" + $json.output.subject }}",
+        "message": "={{\n\"An email is waiting for your approval.\\n\\n\" +\n\"Recipient: \" + $json.output.recipient_email + \"\\n\\n\" +\n\"Subject: \" + $json.output.subject + \"\\n\\n\" +\n\"Body:\\n\" + $json.output.email_body + \"\\n\\n\" +\n\"--------------------------------------\\n\" +\n\"Reply with one of these words:\\n\\n\" +\n\"APPROVE\\n\\nor\\n\\nREJECT\"\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        496,
+        -128
+      ],
+      "id": "a84ee532-e9a1-4bcf-a12a-d740791f9ca4",
+      "name": "send approval request",
+      "webhookId": "33b7373d-3716-4baa-ba59-77c575c9dbba",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YAAYJKhBLy9yxGpE",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Send a message in Gmail",
+        "sendTo": "={{ $fromAI(\"recipient_email\") }}",
+        "subject": "={{ $fromAI(\"subject\") }}",
+        "message": "={{ $fromAI(\"email_body\") }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        16,
+        304
+      ],
+      "id": "2f4a032a-e7f0-4b3c-b728-bf94b2740385",
+      "name": "Send a message in Gmail",
+      "webhookId": "cb520e7e-7c03-4167-9644-c176853d7841",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YAAYJKhBLy9yxGpE",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "send approval request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "84e0bb26-ce91-4883-ba33-d31026d69bcd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7f6f8d347ba637c87fa8f7df217d17592811c78983f59f56bea96913478e5fe3"
+  },
+  "nodeGroups": [],
+  "id": "of9NDiZB8LrFkhnI",
+  "tags": []
+}
